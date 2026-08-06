@@ -13,6 +13,7 @@ model MenuItem {
   description String   @default("")
   price       String
   category    String
+  subCategory String?
   badge       String?
   imageUrl    String?
   sortOrder   Int      @default(0)

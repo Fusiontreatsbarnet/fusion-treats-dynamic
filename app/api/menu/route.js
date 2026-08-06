@@ -17,6 +17,7 @@ export async function POST(request) {
       description: body.description || "",
       price: body.price,
       category: body.category,
+      subCategory: body.subCategory || null,
       badge: body.badge || null,
       imageUrl: body.imageUrl || null,
       sortOrder: body.sortOrder || 0,

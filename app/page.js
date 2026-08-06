@@ -1,5 +1,7 @@
 const { prisma } = require("../lib/prisma");
-const MenuBrowser = require("../components/MenuBrowser").default;
+const { ItemCard } = require("../components/MenuBrowser");
+const SiteHeader = require("../components/SiteHeader").default;
+const SiteFooter = require("../components/SiteFooter").default;
 
 export const dynamic = "force-dynamic";
 
@@ -10,27 +12,13 @@ export default async function HomePage() {
     prisma.page.findMany({ where: { isPublished: true } }),
   ]);
 
+  // Homepage shows a short highlights preview only — the full menu lives on its own page.
+  const badgedItems = menuItems.filter((i) => i.badge);
+  const highlightItems = [...badgedItems, ...menuItems.filter((i) => !i.badge)].slice(0, 8);
+
   return (
     <main>
-      <header>
-        <nav className="topnav">
-          <a href="#home" className="logo">FUSION <span>TREATS</span></a>
-          <div className="nav-links">
-            <a href="#about">About</a>
-            <a href="#menu">Menu</a>
-            <a href="#reviews">Reviews</a>
-            <a href="#catering">Catering</a>
-            <a href="#contact">Find Us</a>
-            {pages.map((p) => (
-              <a key={p.id} href={`/${p.slug}`}>{p.title}</a>
-            ))}
-          </div>
-          <div style={{ display: "flex", gap: 10 }}>
-            <a href="tel:+447344449812" className="btn ghost">Call Us</a>
-            <a href="#contact" className="btn">Order Now</a>
-          </div>
-        </nav>
-      </header>
+      <SiteHeader pages={pages} />
 
       {/* HERO */}
       <section className="hero wrap" id="home">
@@ -39,11 +27,14 @@ export default async function HomePage() {
           <h1>British classics,<br /><em>rewired</em> with spice.</h1>
           <p>Fusion Treats — smash burgers, loaded fries, rice bowls and sandwiches, built on authentic Indian flavour. Freshly prepared, cooked to order, every single day.</p>
           <div style={{ display: "flex", gap: 14, marginTop: 26 }}>
-            <a href="#menu" className="btn">View The Menu</a>
+            <a href="/menu" className="btn">View The Menu</a>
             <a href="#catering" className="btn ghost">Book Catering</a>
           </div>
         </div>
-        <div className="window"><span className="window-tag">Serving Window · Open Daily</span></div>
+        <div className="window hero-photo">
+          <img src="/images/food-truck.jpg" alt="The Fusion Treats food truck, lit up at night in High Barnet" />
+          <span className="window-tag">Serving Window · Open Daily</span>
+        </div>
       </section>
 
       {/* ABOUT */}
@@ -65,7 +56,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* MENU (live from DB) */}
+      {/* MENU HIGHLIGHTS (full menu lives on /menu) */}
       <section className="pad" id="menu">
         <div className="wrap">
           <span className="label">The Menu</span>
@@ -74,10 +65,12 @@ export default async function HomePage() {
             <p style={{ fontSize: "0.82rem", letterSpacing: "0.04em", color: "var(--turquoise)", marginBottom: 4 }}>🔥 MAINS SPECIAL OFFER 🔥</p>
             <p style={{ color: "var(--sand)", fontSize: "0.92rem" }}>Buy any 1 main item and get your 2nd main item for <strong style={{ color: "var(--cream)" }}>HALF PRICE!</strong></p>
           </div>
-          <MenuBrowser items={menuItems} />
-          <p style={{ marginTop: 26, fontSize: "0.85rem", color: "var(--sand)" }}>
-            <strong style={{ color: "var(--cream)" }}>Signature sauces:</strong> Burger Sauce (House), Thai Sweet Chili, Spicy Sauce (House), Buffalo, Spicy BBQ.
-          </p>
+          <div className="menu-grid">
+            {highlightItems.map((item) => <ItemCard item={item} key={item.id} />)}
+          </div>
+          <div style={{ textAlign: "center", marginTop: 32 }}>
+            <a href="/menu" className="btn">View Full Menu →</a>
+          </div>
         </div>
       </section>
 
@@ -167,12 +160,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <footer>
-        <div className="wrap">
-          <p style={{ marginBottom: 14 }}>Fusion Treats is the trading name of S &amp; D Vision Ltd, a company registered in England and Wales.</p>
-          <p>© {new Date().getFullYear()} S &amp; D Vision Ltd. All Rights Reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
